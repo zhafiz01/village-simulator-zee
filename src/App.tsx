@@ -1,14 +1,12 @@
-import { useState } from 'react'
-import './App.sass'
+import Map from "./components/Map";
 
-function App() {
-  const [] = useState()
-
+const App = () => {
   return (
     <div>
-      Hello World
+      <h1>Village Simulator</h1>
+      <Map gridSize={5} /> {/* You can change this number if needed */}
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
