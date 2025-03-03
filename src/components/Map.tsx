@@ -1,55 +1,52 @@
-import { useState } from "react"
-import Tile from "./Tile"
-import "../Map.sass"
+import { useState } from "react";
+import Tile from "./Tile";
+import AddImprovementDialog from "./AddImprovementDialog";
+import "../Map.sass";
 
 interface MapProps {
-  gridSize: number
+  gridSize: number;
 }
-
-type ImprovementType = "house" | "field" | "pasture" | "lumber-mill" | "well" | null
 
 const Map = ({ gridSize }: MapProps) => {
-  const [tiles, setTiles] = useState<(ImprovementType)[]>(
-    Array(gridSize * gridSize).fill(null) //we should start w empty tiles here
-  )
+  const [tiles, setTiles] = useState<(string | null)[]>(Array(gridSize * gridSize).fill(null)); // Stores improvements
+
+  const [selectedTile, setSelectedTile] = useState<number | null>(null); // Tracks selected tile
 
   const handleTileClick = (index: number) => {
-    console.log(`Tile ${index} clicked`)
+    console.log(`Tile ${index} clicked`);
+    setSelectedTile(index); // Opens dialog for selected tile
+  };
 
-    const improvementOrder: ImprovementType[] = ["house", "field", "pasture", "lumber-mill", "well", null]
-    const currentImprovement = tiles[index]
-    const nextImprovement = improvementOrder[
-      (improvementOrder.indexOf(currentImprovement) + 1) % improvementOrder.length
-    ]
-    
-    setTiles((prevTiles) => {
-      const newTiles = [...prevTiles]
-      newTiles[index] = nextImprovement
-      return newTiles
-    })
-  }
+  const handleCloseDialog = () => {
+    setSelectedTile(null); // Closes the dialog
+  };
+
+  const handleSelectImprovement = (improvement: string) => {
+    if (selectedTile !== null) {
+      setTiles((prevTiles) => {
+        const newTiles = [...prevTiles];
+        newTiles[selectedTile] = improvement; // Places improvement on tile
+        return newTiles;
+      });
+    }
+    setSelectedTile(null); // Closes dialog after placing
+  };
 
   return (
-    <div className="map"
-    style={{
-      display: "grid",
-      gridTemplateColumns: `repeat(${gridSize}, 1fr)`, //might be redundant and not needed
-      gridTemplateRows: `repeat(${gridSize}, 1fr)`, 
-      width: "500px",
-      height: "500px",
-      gap: "4px",
-      border: "2px solid #5a7d7c"
-    }}>
+    <div className="map">
       {tiles.map((improvement, index) => (
-        <Tile key={index}
-        index={index}
-        improvement={improvement}
-        onClick={handleTileClick} />
+        <Tile key={index} index={index} improvement={improvement} onClick={handleTileClick} />
       ))}
+
+      {selectedTile !== null && (
+        <AddImprovementDialog
+          tileIndex={selectedTile}
+          onClose={handleCloseDialog}
+          onSelectImprovement={handleSelectImprovement}
+        />
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default Map
-
-
+export default Map;
