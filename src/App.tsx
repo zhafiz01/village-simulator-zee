@@ -1,4 +1,6 @@
+import { useState } from "react";
 import Map from "./components/Map";
+
 import { Improvement } from "models/Improvement";
 import { useState } from "react";
 
@@ -102,6 +104,25 @@ const App = () => {
     <div>
       <h1>Village Simulator</h1>
       <Map gridSize={5} /> 
+=======
+import ResourcesView from "./components/ResourceView";
+import "./App.sass";
+
+const App = () => {
+  const [resources, setResources] = useState({
+    lumber: 5,
+    grain: 5,
+    water: 5,
+    sheep: 1,
+    people: 0,
+  });
+
+  return (
+    <div>
+      <h1>Village Simulator</h1>
+      <ResourcesView resources={resources} />
+      <Map gridSize={5} resources={resources} setResources={setResources} />
+
     </div>
   );
 };
