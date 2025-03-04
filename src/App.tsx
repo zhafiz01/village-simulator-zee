@@ -1,30 +1,67 @@
 import Map from "./components/Map";
+import { Improvement } from "models/Improvement"
 import { useState } from 'react'
 
 
 const App = () => {
-  const [resources, setResources] = useState<Resource[]>([
-    {
-      type: "lumberMill",
-      amount: 5
+  const [resources, setResources] = useState({
+    Lumber: 5,
+    Grain: 5,
+    Water: 5,
+    Sheep: 1
+
+  });
+
+  const [improvements, setImprovements] = useState ([])
+
+  const improvementTypes = {
+    House: {
+      cost: {
+        Lumber: 5,
+        Grain: 5,
+        Water: 5,
+        Sheep: 1
+      },
+      produces: {People: 5}
     },
-    {
-      type: "Grain",
-      amount: 5, 
+    Field: {
+      cost: {
+        People: 1,
+        Water: 2
+      },
+      produces: {Grain: 10}
     },
-    {
-      type: "Water",
-      amount: 5, 
+    LumberMill: {
+      cost: {Person: 1},
+      produces: {Lumber: 10}
     },
-    {
-      type: "Sheep",
-      amount: 1, 
+    Pasture: {
+      cost: {Grain: 3},
+      produces: {Sheep: 1}
     },
-    {
-      type: "People",
-      amount: 0, 
-    },
-  ]);
+    Well: {
+      cost: {
+        people: 1,
+        Lumber: 2
+      },
+      produces: {water: 10}
+
+    }
+  }
+
+  //checks resources for improvement
+  const canPlaceImprovement = (type) => {
+    const cost = improvementTypes[type].cost;
+    return Object.
+  }
+
+const useResource = (resource: any, amount: any) => {
+  setResources(prevState => ({
+    ...prevState,
+    [resource]: Math.max(0, prevState[resource] - amount),
+  }));
+}
+  
 
 
   return (
