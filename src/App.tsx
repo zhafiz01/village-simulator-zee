@@ -1,75 +1,110 @@
 import Map from "./components/Map";
-import { Improvement } from "models/Improvement"
-import { useState } from 'react'
-
+import { Improvement } from "models/Improvement";
+import { useState } from "react";
 
 const App = () => {
   const [resources, setResources] = useState({
     Lumber: 5,
     Grain: 5,
     Water: 5,
-    Sheep: 1
-
+    Sheep: 1,
   });
 
-  const [improvements, setImprovements] = useState ([])
+  const [improvements, setImprovements] = useState([]);
 
-  const improvementTypes = {
-    House: {
-      cost: {
-        Lumber: 5,
-        Grain: 5,
-        Water: 5,
-        Sheep: 1
-      },
-      produces: {People: 5}
+  const improvementTypes = [
+    {
+      name: "House",
+      cost: [
+        { type: "Lumber", amount: 5 },
+        { type: "Grain", amount: 5 },
+        { type: "Water", amount: 5 },
+        { type: "Sheep", amount: 1 },
+      ],
+      produces: [{ type: "People", amount: 5 }],
     },
-    Field: {
-      cost: {
-        People: 1,
-        Water: 2
-      },
-      produces: {Grain: 10}
+    {
+      name: "Field",
+      cost: [
+        { type: "People", amount: 1 },
+        { type: "Water", amount: 2 },
+      ],
+      produces: [{ type: "Grain", amount: 10 }],
     },
-    LumberMill: {
-      cost: {Person: 1},
-      produces: {Lumber: 10}
+    {
+      name: "Pasture",
+      cost: [
+        { type: "People", amount: 1 },
+        { type: "Grain", amount: 2 },
+        { type: "Water", amount: 2 },
+      ],
+      produces: [{ type: "Sheep", amount: 5 }],
     },
-    Pasture: {
-      cost: {Grain: 3},
-      produces: {Sheep: 1}
+    {
+      name: "Lumber Mill",
+      cost: [{ type: "People", amount: 1 }],
+      produces: [{ type: "Lumber", amount: 10 }],
     },
-    Well: {
-      cost: {
-        people: 1,
-        Lumber: 2
-      },
-      produces: {water: 10}
+    {
+      name: "Well",
+      cost: [
+        { type: "People", amount: 1 },
+        { type: "Lumber", amount: 2 },
+      ],
+      produces: [{ type: "Water", amount: 10 }],
+    },
+  ];
 
-    }
+  function handleResourceUpdate(_improvement: Improvement) {
+    setResources((prevResources) => {
+      const updatedResources = { ...prevResources };
+      return updatedResources; // Ensure function returns updated state
+    });
   }
 
-  //checks resources for improvement
-  const canPlaceImprovement = (type) => {
-    const cost = improvementTypes[type].cost;
-    return Object.
-  }
+  const canPlaceImprovement = (type: string) => {
+    const improvement = improvementTypes.find((imp) => imp.name === type);
+    if (!improvement) return false;
 
-const useResource = (resource: any, amount: any) => {
-  setResources(prevState => ({
-    ...prevState,
-    [resource]: Math.max(0, prevState[resource] - amount),
-  }));
-}
-  
+    return improvement.cost.every(({ type, amount }) => (resources[type] ?? 0) >= amount);
+  };
 
+  const placeImprovement = (type: String) => {
+    const improvement = improvementTypes.find((imp) => imp.name === type);
+    if (!improvement || !canPlaceImprovement(type)) return alert("Not enough resources!");
+
+    const newResources = { ...resources };
+    improvement.cost.forEach(({ type, amount }) => {
+      newResources[type] -= amount;
+    });
+
+    setImprovements([...improvements, { type, level: 1 }]);
+    setResources(newResources);
+  };
+
+  const generateResources = () => {
+    const newResources = { ...resources };
+
+    improvements.forEach(({ type, level }) => {
+      const improvement = improvementTypes.find((imp) => imp.name === type);
+      if (!improvement) return;
+
+      improvement.produces.forEach(({ type, amount }) => {
+        newResources[type] = (newResources[type] ?? 0) + amount * level;
+
+      });
+    });
+
+    setResources(newResources);
+  };
 
   return (
     <div>
       <h1>Village Simulator</h1>
-      <Map gridSize={5} /> {/* You can change this number if needed */}
+      <Map gridSize={5} /> 
     </div>
   );
 };
 
 export default App;
+
