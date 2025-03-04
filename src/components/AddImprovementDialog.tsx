@@ -13,7 +13,7 @@ const AddImprovementDialog = ({ tileIndex, onClose, onSelectImprovement }: AddIm
     <div className="dialog-overlay">
       <div className="dialog">
         <h2>Add Improvement</h2>
-        <p>Choose an improvement For Your Land!</p>
+        <p>Choose an improvement for your land!</p>
         <button onClick={() => onSelectImprovement("House")}>🏠 House</button>
         <button onClick={() => onSelectImprovement("Field")}>🌾 Field</button>
         <button onClick={() => onSelectImprovement("Pasture")}>🐑 Pasture</button>
