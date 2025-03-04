@@ -1,22 +1,25 @@
-import { useState } from "react"
+import "../ResourceLine.sass";
 
-const [resource, setResource] = useState([
-    {id: 1, type: "People", quantity: 4},
-    {id: 2, type: "Grain", quantity: 13},
-    {id: 3, type: "Sheep", quantity: 4},
-    {id: 4, type: "Lumber", quantity: 1},
-    {id: 5, type: "Water", quantity: 9}
-])
-
-export function ResourceLine() {
-    return (
-        <div>
-            {resource.map((resources) => (
-                        <tr key={resources.id}>
-                            <td>{resources.type}</td>
-                            <td>{resources.quantity}</td>
-                        </tr>
-                    ))}
-        </div>
-    )
+interface ResourceLineProps {
+  name: string;
+  amount: number;
 }
+
+const resourceIcons: { [key: string]: string } = {
+  lumber: "🌲",
+  grain: "🌾",
+  water: "💧",
+  sheep: "🐑",
+  people: "👥",
+};
+
+const ResourceLine = ({ name, amount }: ResourceLineProps) => {
+  return (
+    <div className="resource-line">
+      <span>{resourceIcons[name]} {name}:</span>
+      <span>{amount}</span>
+    </div>
+  );
+};
+
+export default ResourceLine;
