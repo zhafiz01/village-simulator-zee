@@ -1,5 +1,4 @@
 import ResourceLine from "./ResourceLine";
-// import "../ResourcesView.sass";
 
 interface ResourcesViewProps {
   resources: {
@@ -14,7 +13,7 @@ interface ResourcesViewProps {
 const ResourcesView = ({ resources }: ResourcesViewProps) => {
   return (
     <div className="resources">
-      <h2>Resources</h2>
+      <h2 className="resources-header">Resources Remaining:</h2>
       {Object.entries(resources).map(([name, amount]) => (
         <ResourceLine key={name} name={name} amount={amount} />
       ))}

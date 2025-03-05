@@ -1,5 +1,3 @@
-import "../ResourceLine.sass";
-
 interface ResourceLineProps {
   name: string;
   amount: number;
