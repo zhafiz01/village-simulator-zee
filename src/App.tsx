@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
-import Map from "./components/Map";
-import ResourcesView from "./components/ResourceView";
-import { Improvement } from '../models/Improvement';
-import { Resources } from '../models/Resources';
-import "./App.sass";
+import { useState, useEffect } from "react"
+import Map from "./components/Map"
+import ResourcesView from "./components/ResourceView"
+import { Improvement } from '../models/Improvement'
+import { Resources } from '../models/Resources'
+import "./App.sass"
 
 const App = () => {
   const [resources, setResources] = useState<Resources>({
@@ -12,7 +12,7 @@ const App = () => {
     water: 5,
     sheep: 1,
     people: 0,
-  });
+  })
 
   const improvementTypes: Improvement[] = [
     {
@@ -65,51 +65,52 @@ const App = () => {
       ],
       resourceProduced: [{ type: "Water", amount: 10 }],
     },
-  ];
+  ]
 
   const handleResourceUpdate = (improvement: Improvement) => {
     setResources((prevResources) => {
-      const updatedResources = { ...prevResources };
+      const updatedResources = { ...prevResources }
       improvement.cost.forEach(({ type, amount }) => {
-        updatedResources[type as keyof Resources] -= amount;
-      });
+        updatedResources[type as keyof Resources] -= amount
+      })
       improvement.resourceProduced?.forEach(({ type, amount }) => {
-        updatedResources[type as keyof Resources] += amount;
-      });
-      return updatedResources;
-    });
-  };
+        updatedResources[type as keyof Resources] += amount
+      })
+      return updatedResources
+    })
+  }
 
   const canPlaceImprovement = (type: string) => {
-    const improvement = improvementTypes.find((imp) => imp.type === type);
-    if (!improvement) return false;
+    const improvement = improvementTypes.find((imp) => imp.type === type)
+    if (!improvement) return false
 
     return improvement.cost.every(
       ({ type: costType, amount }) => resources[costType as keyof Resources] >= amount
-    );
-  };
+    )
+  }
 
   const placeImprovement = (type: string) => {
     if (!canPlaceImprovement(type)) {
-      return alert("Not enough resources!");
+      return alert("Not enough resources!")
     }
 
-    const improvement = improvementTypes.find((imp) => imp.type === type);
-    if (!improvement) return;
+    const improvement = improvementTypes.find((imp) => imp.type === type)
+    if (!improvement) return
 
-    handleResourceUpdate(improvement);
-  };
+    handleResourceUpdate(improvement)
+  }
 
   return (
     <div>
       <h1 className="header">Village Simulator</h1>
-      <p className="intro">Click on a tile to add or upgrade an improvement on the map.<br />
-        Pay attention to your remaining resources and the cost of improvements!
+      <p className="intro">Click on a tile to add an improvement to your village. Each improvement both costs and adds resources.<br />
+        Click on an improvement to see if you have enough resources to upgrade it.<br />
+        Try to fill up the map without running out of resources!
       </p>
       <ResourcesView resources={resources} />
       <Map gridSize={5} resources={resources} setResources={setResources} />
     </div>
-  );
-};
+  )
+}
 
-export default App;
+export default App

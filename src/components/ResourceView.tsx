@@ -1,25 +1,25 @@
-import ResourceLine from "./ResourceLine";
+import ResourceLine from "./ResourceLine"
 
 interface ResourcesViewProps {
   resources: {
-    lumber: number;
-    grain: number;
-    water: number;
-    sheep: number;
-    people: number;
-  };
+    lumber: number
+    grain: number
+    water: number
+    sheep: number
+    people: number
+  }
 }
 
 const ResourcesView = ({ resources }: ResourcesViewProps) => {
   return (
     <div className="resources">
-      <h2 className="resources-header">Resources Remaining:</h2>
+      <h2 className="resources-header">Remaining Resources:</h2>
       {Object.entries(resources).map(([name, amount]) => (
         <ResourceLine key={name} name={name} amount={amount} />
       ))}
     </div>
-  );
-};
+  )
+}
 
-export default ResourcesView;
+export default ResourcesView
 
