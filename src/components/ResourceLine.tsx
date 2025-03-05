@@ -1,8 +1,6 @@
-import "../ResourceLine.sass";
-
 interface ResourceLineProps {
-  name: string;
-  amount: number;
+  name: string
+  amount: number
 }
 
 const resourceIcons: { [key: string]: string } = {
@@ -11,15 +9,15 @@ const resourceIcons: { [key: string]: string } = {
   water: "💧",
   sheep: "🐑",
   people: "👥",
-};
+}
 
 const ResourceLine = ({ name, amount }: ResourceLineProps) => {
   return (
     <div className="resource-line">
-      <span>{resourceIcons[name]} {name}:</span>
-      <span>{amount}</span>
-    </div>
-  );
-};
+    <span>{resourceIcons[name]} {name}:</span>
+    <span>{amount}</span>
+  </div>
+  )
+}
 
-export default ResourceLine;
+export default ResourceLine
