@@ -49,6 +49,7 @@ const Map = ({ gridSize, resources, setResources }: MapProps) => {
   
 
   const handleTileClick = (index: number) => {
+    
     setSelectedTile(index)
   }
 

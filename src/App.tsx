@@ -17,7 +17,7 @@ const App = () => {
   const [resources, setResources] = useState<Resources>({
     ...initialResources
   })
-  const [placedImprovements, setPlacedImprovements] = useState<Improvement[]>([])
+  const [placedImprovements, setPlacedImprovements] = useState<{ position: number; type: string}[]>([])
 
   const resetGame = () => {
     setResources({ ...initialResources })
