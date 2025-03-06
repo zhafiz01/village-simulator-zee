@@ -47,7 +47,7 @@ const EditImprovementDialog = ({
         <p>Current Level: {currentLevel}</p>
         <p>Upgrade to Level: {nextLevel}</p>
 
-        <h3>Upgrade Cost:</h3>
+        <h3>Upgrade Costs:</h3>
         <ul>
           {Object.entries(scaledUpgradeCost).map(([resource, amount]) =>
             amount > 0 ? <li key={resource}>{resource}: {amount}</li> : null

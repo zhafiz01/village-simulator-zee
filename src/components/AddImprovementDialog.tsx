@@ -16,7 +16,7 @@ const AddImprovementDialog = ({ tileIndex, onClose, onSelectImprovement, improve
   return (
     <div className="dialog-overlay">
       <div className="dialog">
-        <h2>Add Improvement</h2>
+        <h2>🌼 Add Improvement</h2>
         <p>Choose an improvement for your land!</p>
 
         {Object.keys(improvementsData).map((improvement) => (
