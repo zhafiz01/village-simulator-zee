@@ -15,64 +15,21 @@
   margin-left: 480px
   font-weight: bold
   font-size: 15px
-  font-family: 'Playwrite IN', serif;
+  font-family: 'Playwrite IN', serif
 
-.resources-header
-  text-align: center
-  font-family: 'Playwrite IN', serif;
-  margin: 0
-
-.map
-  display: grid
-  grid-template-columns: repeat(5, 1fr)
-  grid-template-rows: repeat(5, 1fr)
-  gap: 2px
-  border: 1px solid #77a662
-  width: 500px
-  height: 500px
-  margin: auto
-
-.tile
-  background-color: #fff5c2
-  border: 1px solid #77a662
-  width: 100%
-  height: 100%
-  cursor: pointer
-  display: flex
-  align-items: center
-  justify-content: center
-  transition: background 0.2s ease-in-out
-
-  &:hover
-    background-color: #b4cca9
-
-.improvement-label
-  font-size: 11px
-  font-weight: bold
-  color: #635b46
-  font-family: 'Playwrite IN', serif;
-
-.improvement-icon
-  width: 65px
-  height: 65px
-  display: flex
-  align-items: center
-  justify-content: center
-
-.game-container
-  display: flex
-  justify-content: center
-  align-items: flex-start
-  margin-top: 0
-  padding-top: 0
-
-.resources
+.resources-container
   position: absolute
   left: 17em
   top: 11em
+  display: flex
   flex-direction: column
   align-items: flex-start
   width: 200px
+
+.resources-header
+  text-align: center
+  font-family: 'Playwrite IN', serif
+  margin: 0
 
 .resource-line
   display: flex
@@ -83,6 +40,66 @@
   border: 1px solid #77a662
   background-color: #fff5c2
   padding: 10px
+
+.reset-button
+  margin-top: 10px
+  background-color: #77a662
+  color: white
+  padding: 10px 20px
+  font-size: 16px
+  border: none
+  border-radius: 5px
+  cursor: pointer
+
+.map
+  display: grid
+  grid-template-columns: repeat(5, 1fr)
+  grid-template-rows: repeat(5, 1fr)
+  gap: 2px
+  border: 1px solid #77a662
+  width: 500px
+  height: 500px
+  margin: auto
+  box-sizing: border-box
+
+.tile
+  background-color: #fff5c2
+  border: 1px solid #77a662
+  width: 100%
+  height: 100%
+  display: flex
+  align-items: center
+  justify-content: center
+  position: relative
+  overflow: hidden
+
+  &:hover
+    background-color: #b4cca9
+
+.improvement-label
+  display: block
+  text-align: center
+  margin-top: 5px
+  font-size: 12px
+  font-weight: bold
+  color: #635b46
+  font-family: 'Playwrite IN', serif
+
+
+.improvement-icon
+  max-width: 40%
+  max-height: 40%
+  object-fit: contain
+  display: block
+  margin: auto
+
+
+.game-container
+  display: flex
+  justify-content: center
+  align-items: flex-start
+  margin-top: 0
+  padding-top: 0
 
 .dialog-overlay
   position: fixed
@@ -166,7 +183,9 @@
 .level-badge
   color: #635b46
   font-size: 12px
-  font-family: 'Playwrite IN', serif;
+  font-family: 'Playwrite IN', serif
+   display: block
+  text-align: center
 
 .popup-container
   position: fixed
@@ -194,9 +213,3 @@
 .border-image
   position: fixed
   top: 0
-
-
-.reset-button
-    align: center
-    justify-content: center
-    align-items: center
