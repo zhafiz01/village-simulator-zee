@@ -4,6 +4,8 @@ import ResourcesView from "./components/ResourceView"
 import { Improvement } from '../models/Improvement'
 import { Resources } from '../models/Resources'
 import "./App.sass"
+import borderImage from "./assets/UpperLeft.png"
+import background from './assets/Background.png'
 
 const initialResources: Resources = {
   lumber: 5,
@@ -126,7 +128,11 @@ const App = () => {
         placedImprovements={placedImprovements}
         setPlacedImprovements={setPlacedImprovements}
         />
+    <div className="border-image">
+      <img src={borderImage} alt="Border" />
     </div>
+    <div className="app" style={{ background: `url(${background})` }}></div>
+    </div>   
   )
 }
 
