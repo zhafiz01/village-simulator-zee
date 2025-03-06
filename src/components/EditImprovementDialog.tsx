@@ -1,93 +1,84 @@
-import { useState, useEffect } from "react"
 import { Resources } from "../../models/Resources"
 
 interface EditImprovementDialogProps {
   improvement: string
   level: number
   resources: Resources
-  onUpgrade: (newLevel: number) => void
-  onDowngrade: (newLevel: number) => void
+  onUpgrade: () => void
+  onDowngrade: () => void
   onRemove: () => void
   onClose: () => void
-}
-
-const upgradeCosts: Record<string, (level: number) => Partial<Resources>> = {
-  House: (level) => ({ lumber: level * 10 }),
-  Field: (level) => ({ people: level * 5, water: level * 5 }),
-  "Lumber Mill": (level) => ({ people: level * 5 }),
-  Well: (level) => ({ lumber: level * 5, people: level * 5 }),
-  Pasture: (level) => ({ grain: level * 5, people: level * 5, water: level * 5 }),
-}
-
-const upgradeAdds: Record<string, () => Partial<Resources>> = {
-  House: () => ({ people: 2 }),
-  Field: () => ({ grain: 5 }),
-  "Lumber Mill": () => ({ lumber: 5 }),
-  Well: () => ({ water: 5 }),
-  Pasture: () => ({ sheep: 3 }),
+  improvementsData: Record<string, { cost: Resources; benefit: Resources }>
 }
 
 const EditImprovementDialog = ({
   improvement,
-  level = 1,
+  level,
   resources,
   onUpgrade,
   onDowngrade,
   onRemove,
   onClose,
+  improvementsData,
 }: EditImprovementDialogProps) => {
-  const [newLevel, setNewLevel] = useState(level)
-  const [upgradeCost, setUpgradeCost] = useState<Partial<Resources>>({})
 
-  useEffect(() => {
-    const cost = upgradeCosts[improvement]?.(newLevel + 1) || {}
-    setUpgradeCost(cost)
-  }, [improvement, newLevel])
+  const nextLevel = level + 1
+  const currentLevel = level
 
-  const canUpgrade = Object.entries(upgradeCost).every(([resource, cost]) => {
-    const resourceAmount = resources[resource as keyof typeof resources] || 0
-    return resourceAmount >= cost
-  })
+  const baseCost = improvementsData[improvement].cost
+  const baseBenefit = improvementsData[improvement].benefit
+
+  const scaledUpgradeCost = Object.fromEntries(
+    Object.entries(baseCost).map(([resource, amount]) => [resource, amount * nextLevel])
+  )
+
+  const scaledUpgradeBenefit = Object.fromEntries(
+    Object.entries(baseBenefit).map(([resource, amount]) => [resource, amount])
+  )
+
+  const canUpgrade = Object.entries(scaledUpgradeCost).every(
+    ([resource, amount]) => resources[resource as keyof Resources] >= amount
+  )
 
   return (
     <div className="upgrade-wrapper">
       <div className="upgrade-dialog">
-        <h2>Upgrade {improvement}</h2>
-        <p>Current Level: {level}</p>
+        <h2>{improvement}</h2>
+        <p>Current Level: {currentLevel}</p>
+        <p>Upgrade to Level: {nextLevel}</p>
 
-        <h3>This Upgrade Costs:</h3>
+        <h3>Upgrade Cost:</h3>
         <ul>
-          {Object.entries(upgradeCost).map(([resource, cost]) => (
-            <li key={resource}>
-              {resource}: {cost}
-            </li>
-          ))}
+          {Object.entries(scaledUpgradeCost).map(([resource, amount]) =>
+            amount > 0 ? <li key={resource}>{resource}: {amount}</li> : null
+          )}
         </ul>
 
-        <h3>This Upgrade Adds:</h3>
+        <h3>Upgrade Adds (per upgrade):</h3>
         <ul>
-          {Object.entries(upgradeAdds[improvement]()).map(([resource, add]) => (
-            <li key={resource}>
-              {resource}: {add}
-            </li>
-          ))}
+          {Object.entries(scaledUpgradeBenefit).map(([resource, amount]) =>
+            amount > 0 ? <li key={resource}>{resource}: {amount}</li> : null
+          )}
         </ul>
 
-        <button onClick={() => onUpgrade(newLevel + 1)} disabled={!canUpgrade}>
-          Upgrade to Level {newLevel + 1}
+        <button onClick={onUpgrade} disabled={!canUpgrade}>
+          Upgrade to Level {nextLevel}
         </button>
 
-        <button onClick={() => onDowngrade(newLevel - 1)}>
+        <button onClick={onDowngrade}>
           Downgrade
         </button>
 
-        <button onClick={onRemove}>Remove Improvement</button>
+        <button onClick={onRemove}>
+          Remove Improvement
+        </button>
 
-        <button onClick={onClose}>Close</button>
+        <button onClick={onClose}>
+          Close
+        </button>
       </div>
     </div>
   )
 }
 
 export default EditImprovementDialog
-

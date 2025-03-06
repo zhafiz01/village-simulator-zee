@@ -1,231 +1,180 @@
-import { useEffect, useState } from "react"
-import Tile from "./Tile"
-import AddImprovementDialog from "./AddImprovementDialog"
-import EditImprovementDialog from "./EditImprovementDialog"
+import { useState, useEffect } from "react";
+import Tile from "./Tile";
+import AddImprovementDialog from "./AddImprovementDialog";
+import EditImprovementDialog from "./EditImprovementDialog";
+import { Resources } from "../../models/Resources";
 
 interface MapProps {
-  gridSize: number
-  resources: {
-    lumber: number
-    grain: number
-    water: number
-    sheep: number
-    people: number
-  }
-  setResources: React.Dispatch<
-    React.SetStateAction<{
-      lumber: number
-      grain: number
-      water: number
-      sheep: number
-      people: number
-    }>
-  >
+  gridSize: number;
+  resources: Resources;
+  setResources: React.Dispatch<React.SetStateAction<Resources>>;
+  improvementsData: Record<string, { cost: Resources; benefit: Resources }>;
+  resetKey: number;
 }
 
-const improvementCosts = {
-  House: { lumber: 5, grain: 5, water: 5, sheep: 1 },
-  Field: { people: 1, water: 2 },
-  Pasture: { people: 1, grain: 2, water: 2 },
-  "Lumber Mill": { people: 1 },
-  Well: { people: 1, lumber: 2 },
-}
+const Map = ({ gridSize, resources, setResources, improvementsData, resetKey }: MapProps) => {
+  const [tiles, setTiles] = useState<(string | null)[]>(Array(gridSize * gridSize).fill(null));
+  const [selectedTile, setSelectedTile] = useState<number | null>(null);
+  const [improvementLevels, setImprovementLevels] = useState<Record<number, number>>({});
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
 
-const upgradeCosts: Record<string, (level: number) => Partial<MapProps["resources"]>> = {
-  House: (level) => ({ lumber: level * 10 }),
-  Field: (level) => ({ grain: level * 8, water: level * 5 }),
-  "Lumber Mill": (level) => ({ people: level * 2 }),
-  Well: (level) => ({ water: level * 10 }),
-  Pasture: (level) => ({ sheep: level * 3, grain: level * 5 }),
-}
-
-const downgradeReturn: Record<string, (level: number) => Partial<MapProps["resources"]>> = {
-  House: (level) => ({ lumber: level * 20 }),
-  Field: (level) => ({ grain: level * 16, water: level * 10 }),
-  "Lumber Mill": (level) => ({ people: level * 4 }),
-  Well: (level) => ({ water: level * 20 }),
-  Pasture: (level) => ({ sheep: level * 6, grain: level * 10 }),
-}
-
-const Map = ({ gridSize, resources, setResources }: MapProps) => {
-  const [tiles, setTiles] = useState<(string | null)[]>(Array(gridSize * gridSize).fill(null))
-  const [selectedTile, setSelectedTile] = useState<number | null>(null)
-  const [improvementLevels, setImprovementLevels] = useState<Record<number, number>>({})
-  const [showPopup, setShowPopup] = useState(false)
-  const [popupMessage, setPopupMessage] = useState('')
-
-  
+  useEffect(() => {
+    setTiles(Array(gridSize * gridSize).fill(null));
+    setImprovementLevels({});
+    setSelectedTile(null);
+  }, [resetKey]);
 
   const handleTileClick = (index: number) => {
-    
-    setSelectedTile(index)
-  }
+    setSelectedTile(index);
+  };
 
   const handleCloseDialog = () => {
-    setSelectedTile(null)
-  }
+    setSelectedTile(null);
+  };
 
   const handleSelectImprovement = (improvement: string) => {
-    if (selectedTile === null) return
+    if (selectedTile === null) return;
 
-    const cost = improvementCosts[improvement as keyof typeof improvementCosts]
-    if (!Object.entries(cost).every(([key, value]) => resources[key as keyof typeof resources] >= value!)) {
-      setPopupMessage("Not enough resources to build this improvement!")
-      setShowPopup(true)
-      return
+    const { cost, benefit } = improvementsData[improvement];
+    const canAfford = Object.entries(cost).every(
+      ([key, value]) => resources[key as keyof Resources] >= value
+    );
+
+    if (!canAfford) {
+      setPopupMessage("Not enough resources!");
+      setShowPopup(true);
+      return;
     }
 
     setResources((prev) => {
-      const updated = { ...prev }
-      Object.entries(cost).forEach(([key, value]) => {
-        updated[key as keyof typeof prev] -= value!
-      })
+      const updated = { ...prev };
+      Object.entries(cost).forEach(([key, value]) => updated[key as keyof Resources] -= value);
+      Object.entries(benefit).forEach(([key, value]) => updated[key as keyof Resources] += value);
+      return updated;
+    });
 
-      switch (improvement) {
-        case "House":
-          updated.people += 5
-          break
-        case "Field":
-          updated.grain += 10
-          break
-        case "Pasture":
-          updated.sheep += 5
-          break
-        case "Lumber Mill":
-          updated.lumber += 10
-          break
-        case "Well":
-          updated.water += 10
-          break
-      }
+    setTiles((prev) => {
+      const newTiles = [...prev];
+      newTiles[selectedTile] = improvement;
+      return newTiles;
+    });
 
-      return updated
-    })
+    setImprovementLevels((prev) => ({ ...prev, [selectedTile]: 1 }));
+    setSelectedTile(null);
+  };
 
-    setTiles((prevTiles) => {
-      const newTiles = [...prevTiles]
-      newTiles[selectedTile] = improvement
-      return newTiles
-    })
+  const handleUpgrade = () => {
+    if (selectedTile === null) return;
+    const improvement = tiles[selectedTile];
+    if (!improvement) return;
 
-    setImprovementLevels((prevLevels) => ({
-      ...prevLevels,
-      [selectedTile]: 1,
-    }))
+    const currentLevel = improvementLevels[selectedTile] || 1;
+    const nextLevel = currentLevel + 1;
 
-    setSelectedTile(null)
-  }
+    const { cost, benefit } = improvementsData[improvement];
 
-  const handleUpgradeImprovement = (newLevel: number) => {
-    if (selectedTile === null) return
-    const currentImprovement = tiles[selectedTile]
-    if (!currentImprovement) return
+    const scaledCost = Object.fromEntries(
+      Object.entries(cost).map(([key, value]) => [key, value * nextLevel])
+    );
 
-    const cost = upgradeCosts[currentImprovement as keyof typeof upgradeCosts](newLevel)
-    if (!Object.entries(cost).every(([key, value]) => resources[key as keyof typeof resources] >= value!)) {
-      setPopupMessage("Not enough resources to upgrade this improvement!")
-      setShowPopup(true)
-      return
+    const scaledBenefit = Object.fromEntries(
+      Object.entries(benefit).map(([key, value]) => [key, value])
+    );
+
+    const canAfford = Object.entries(scaledCost).every(
+      ([key, value]) => resources[key as keyof Resources] >= value
+    );
+
+    if (!canAfford) {
+      setPopupMessage("Not enough resources!");
+      setShowPopup(true);
+      return;
     }
 
     setResources((prev) => {
-      const updated = { ...prev }
-      Object.entries(cost).forEach(([key, value]) => {
-        updated[key as keyof typeof prev] -= value!
-      })
+      const updated = { ...prev };
+      Object.entries(scaledCost).forEach(([key, value]) => updated[key as keyof Resources] -= value);
+      Object.entries(scaledBenefit).forEach(([key, value]) => updated[key as keyof Resources] += value);
+      return updated;
+    });
 
-      switch (currentImprovement) {
-        case "House":
-          updated.people += 2
-          break
-        case "Field":
-          updated.grain += 5
-          break
-        case "Pasture":
-          updated.sheep += 3
-          break
-        case "Lumber Mill":
-          updated.lumber += 5
-          break
-        case "Well":
-          updated.water += 5
-          break
-      }
+    setImprovementLevels((prev) => ({
+      ...prev,
+      [selectedTile]: nextLevel,
+    }));
+  };
 
-      return updated
-    })
+  const handleDowngrade = () => {
+    if (selectedTile === null) return;
+    const improvement = tiles[selectedTile];
+    if (!improvement) return;
 
-    setImprovementLevels((prevLevels) => ({
-      ...prevLevels,
-      [selectedTile]: newLevel,
-    }))
+    const currentLevel = improvementLevels[selectedTile];
+    if (currentLevel <= 1) {
+      setPopupMessage("Cannot downgrade below level 1!");
+      setShowPopup(true);
+      return;
+    }
 
-    setSelectedTile(null)
-  }
+    const { cost, benefit } = improvementsData[improvement];
 
-  const handleDowngradeImprovment = (newLevel: number) => {
-    if (selectedTile === null) return
-    const currentImprovement = tiles[selectedTile]
-    if (!currentImprovement) return
+    const scaledCost = Object.fromEntries(
+      Object.entries(cost).map(([key, value]) => [key, value * currentLevel])
+    );
 
-    const costReturn = downgradeReturn[currentImprovement as keyof typeof downgradeReturn](newLevel)
-    
+    const scaledBenefit = Object.fromEntries(
+      Object.entries(benefit).map(([key, value]) => [key, value])
+    );
 
     setResources((prev) => {
-      const updated = { ...prev }
-      Object.entries(costReturn).forEach(([key, value]) => {
-        updated[key as keyof typeof prev] += value!
-      })
+      const updated = { ...prev };
+      Object.entries(scaledCost).forEach(([key, value]) => updated[key as keyof Resources] += value);
+      Object.entries(scaledBenefit).forEach(([key, value]) => {
+        updated[key as keyof Resources] = Math.max(0, updated[key as keyof Resources] - value);
+      });
+      return updated;
+    });
 
-      switch (currentImprovement) {
-        case "House":
-          updated.people += 2
-          break
-        case "Field":
-          updated.grain += 5
-          break
-        case "Pasture":
-          updated.sheep += 3
-          break
-        case "Lumber Mill":
-          updated.lumber += 5
-          break
-        case "Well":
-          updated.water += 5
-          break
-      }
-
-      return updated
-    })
-
-    setImprovementLevels((prevLevels) => ({
-      ...prevLevels,
-      [selectedTile]: newLevel,
-    }))
-
-    setSelectedTile(null)
-  }
+    setImprovementLevels((prev) => ({
+      ...prev,
+      [selectedTile]: currentLevel - 1,
+    }));
+  };
 
   const handleRemoveImprovement = () => {
-    if (selectedTile === null) return
+    if (selectedTile === null) return;
+    const improvement = tiles[selectedTile];
+    const level = improvementLevels[selectedTile] || 1;
 
-    setTiles((prevTiles) => {
-      const newTiles = [...prevTiles]
-      newTiles[selectedTile] = null
-      return newTiles
-    })
+    if (improvement) {
+      const { cost, benefit } = improvementsData[improvement];
 
-    setImprovementLevels((prevLevels) => {
-      const updatedLevels = { ...prevLevels }
-      delete updatedLevels[selectedTile]
-      return updatedLevels
-    })
+      setResources((prev) => {
+        const updated = { ...prev };
+        Object.entries(cost).forEach(([key, value]) => updated[key as keyof Resources] += value * level);
+        Object.entries(benefit).forEach(([key, value]) => {
+          updated[key as keyof Resources] = Math.max(0, updated[key as keyof Resources] - value * level);
+        });
+        return updated;
+      });
+    }
 
-    setSelectedTile(null)
-  }
+    setTiles((prev) => {
+      const newTiles = [...prev];
+      newTiles[selectedTile] = null;
+      return newTiles;
+    });
 
+    setImprovementLevels((prev) => {
+      const updated = { ...prev };
+      delete updated[selectedTile];
+      return updated;
+    });
 
-  
+    setSelectedTile(null);
+  };
+
   return (
     <div className="map">
       {tiles.map((improvement, index) => (
@@ -253,6 +202,7 @@ const Map = ({ gridSize, resources, setResources }: MapProps) => {
           tileIndex={selectedTile}
           onClose={handleCloseDialog}
           onSelectImprovement={handleSelectImprovement}
+          improvementsData={improvementsData}
         />
       ) : (
         selectedTile !== null &&
@@ -261,15 +211,16 @@ const Map = ({ gridSize, resources, setResources }: MapProps) => {
             improvement={tiles[selectedTile] as string}
             level={improvementLevels[selectedTile] || 1}
             resources={resources}
-            onUpgrade={handleUpgradeImprovement}
-            onDowngrade={handleDowngradeImprovment}
+            onUpgrade={handleUpgrade}
+            onDowngrade={handleDowngrade}
             onRemove={handleRemoveImprovement}
             onClose={handleCloseDialog}
+            improvementsData={improvementsData}
           />
         )
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Map
+export default Map;
