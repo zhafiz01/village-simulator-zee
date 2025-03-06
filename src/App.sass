@@ -24,13 +24,13 @@
 
 .map
   display: grid
-  grid-template-columns: repeat(5, 1fr) 
-  grid-template-rows: repeat(5, 1fr) 
+  grid-template-columns: repeat(5, 1fr)
+  grid-template-rows: repeat(5, 1fr)
   gap: 2px
   border: 1px solid #77a662
   width: 500px
   height: 500px
-  margin: auto  
+  margin: auto
 
 .tile
   background-color: #fff5c2
@@ -44,7 +44,7 @@
   transition: background 0.2s ease-in-out
 
   &:hover
-    background-color:#b4cca9
+    background-color: #b4cca9
 
 .improvement-label
   font-size: 11px
@@ -94,13 +94,16 @@
   justify-content: center
   align-items: center
   margin-top: 10px
+  z-index: 100
 
 .dialog
+  position: relative
   background: white
   padding: 20px
   border-radius: 8px
   text-align: center
   width: 300px
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1)
 
   button
     display: block
@@ -113,21 +116,29 @@
     font-size: 16px
 
   .close-btn
-    background:  #77a662
+    background: #77a662
     color: white
 
-.cost-details
-  position: absolute
-  top: 20em
-  left: 80em
-  width: 310px
-  height: 120px
-  transform: translateX(-50%)
-  background-color: #fff5c2
-  padding: 10px
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1)
-  border-radius: 8px
-  z-index: 10
+  .cost-details
+    position: absolute
+    top: 10px
+    right: -310px
+    width: 280px
+    background-color: #fff5c2
+    padding: 10px
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1)
+    border-radius: 8px
+    z-index: 200
+    text-align: left
+    font-size: 14px
+
+    p
+      font-weight: bold
+      margin-bottom: 5px
+
+    ul
+      padding-left: 20px
+      margin: 5px 0
 
 .upgrade-wrapper
   display: block
@@ -157,21 +168,21 @@
   font-size: 12px
   font-family: 'Playwrite IN', serif;
 
-.popup-container 
-  position: fixed;
-  top: 20%;
-  left: 50%;
-  transform: translateX(-50%);
+.popup-container
+  position: fixed
+  top: 20%
+  left: 50%
+  transform: translateX(-50%)
   background-color: #635b46
-  color: white;
-  padding: 20px;
-  border-radius: 10px;
+  color: white
+  padding: 20px
+  border-radius: 10px
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3)
   z-index: 1000
   width: 300px
   text-align: center
 
-.overlay 
+.overlay
   position: fixed
   top: 0
   left: 0
@@ -183,3 +194,9 @@
 .border-image
   position: fixed
   top: 0
+
+
+.reset-button
+    align: center
+    justify-content: center
+    align-items: center
