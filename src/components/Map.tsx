@@ -31,17 +31,17 @@ const improvementCosts = {
   Well: { people: 1, lumber: 2 },
 }
 
-const upgradeCosts: Record<string, (level: number) => Partial<Resources>> = {
+const upgradeCosts: Record<string, (level: number) => Partial<MapProps["resources"]>> = {
   House: (level) => ({ lumber: level * 10 }),
   Field: (level) => ({ grain: level * 8, water: level * 5 }),
-  LumberMill: (level) => ({ lumber: level * 5 }),
+  "Lumber Mill": (level) => ({ people: level * 2 }),
   Well: (level) => ({ water: level * 10 }),
   Pasture: (level) => ({ sheep: level * 3, grain: level * 5 }),
 }
 
 const Map = ({ gridSize, resources, setResources }: MapProps) => {
   const [tiles, setTiles] = useState<(string | null)[]>(Array(gridSize * gridSize).fill(null))
-  const [selectedTile, setSelectedTile] = useState<number | null>(null);
+  const [selectedTile, setSelectedTile] = useState<number | null>(null)
   const [improvementLevels, setImprovementLevels] = useState<Record<number, number>>({})
   const [showPopup, setShowPopup] = useState(false)
   const [popupMessage, setPopupMessage] = useState('')
@@ -52,15 +52,15 @@ const Map = ({ gridSize, resources, setResources }: MapProps) => {
 
   const handleCloseDialog = () => {
     setSelectedTile(null)
-  };
+  }
 
   const handleSelectImprovement = (improvement: string) => {
     if (selectedTile === null) return
 
-    const cost = improvementCosts[improvement as keyof typeof improvementCosts];
+    const cost = improvementCosts[improvement as keyof typeof improvementCosts]
     if (!Object.entries(cost).every(([key, value]) => resources[key as keyof typeof resources] >= value!)) {
       setPopupMessage("Not enough resources to build this improvement!")
-      setShowPopup(true); // Show the popup
+      setShowPopup(true)
       return
     }
 
@@ -72,19 +72,19 @@ const Map = ({ gridSize, resources, setResources }: MapProps) => {
 
       switch (improvement) {
         case "House":
-          updated.people += 5;
+          updated.people += 5
           break
         case "Field":
-          updated.grain += 10;
+          updated.grain += 10
           break
         case "Pasture":
-          updated.sheep += 5;
+          updated.sheep += 5
           break
         case "Lumber Mill":
-          updated.lumber += 10;
+          updated.lumber += 10
           break
         case "Well":
-          updated.water += 10;
+          updated.water += 10
           break
       }
 
@@ -110,10 +110,10 @@ const Map = ({ gridSize, resources, setResources }: MapProps) => {
     const currentImprovement = tiles[selectedTile]
     if (!currentImprovement) return
 
-    const cost = upgradeCosts[currentImprovement as keyof typeof upgradeCosts](newLevel);
+    const cost = upgradeCosts[currentImprovement as keyof typeof upgradeCosts](newLevel)
     if (!Object.entries(cost).every(([key, value]) => resources[key as keyof typeof resources] >= value!)) {
       setPopupMessage("Not enough resources to upgrade this improvement!")
-      setShowPopup(true); // Show the popup
+      setShowPopup(true)
       return
     }
 
@@ -125,23 +125,23 @@ const Map = ({ gridSize, resources, setResources }: MapProps) => {
 
       switch (currentImprovement) {
         case "House":
-          updated.people += 2;
+          updated.people += 2
           break
         case "Field":
-          updated.grain += 5;
+          updated.grain += 5
           break
         case "Pasture":
-          updated.sheep += 3;
+          updated.sheep += 3
           break
         case "Lumber Mill":
-          updated.lumber += 5;
+          updated.lumber += 5
           break
         case "Well":
-          updated.water += 5;
+          updated.water += 5
           break
       }
 
-      return updated;
+      return updated
     })
 
     setImprovementLevels((prevLevels) => ({
@@ -149,24 +149,48 @@ const Map = ({ gridSize, resources, setResources }: MapProps) => {
       [selectedTile]: newLevel,
     }))
 
-    setSelectedTile(null);
-  };
+    setSelectedTile(null)
+  }
+
+  const handleRemoveImprovement = () => {
+    if (selectedTile === null) return
+
+    setTiles((prevTiles) => {
+      const newTiles = [...prevTiles]
+      newTiles[selectedTile] = null
+      return newTiles
+    })
+
+    setImprovementLevels((prevLevels) => {
+      const updatedLevels = { ...prevLevels }
+      delete updatedLevels[selectedTile]
+      return updatedLevels
+    })
+
+    setSelectedTile(null)
+  }
 
   return (
     <div className="map">
       {tiles.map((improvement, index) => (
-        <Tile key={index} index={index} improvement={improvement} level={improvementLevels[index] || 1} onClick={handleTileClick} />
+        <Tile
+          key={index}
+          index={index}
+          improvement={improvement}
+          level={improvementLevels[index] || 1}
+          onClick={handleTileClick}
+        />
       ))}
 
-{showPopup && (
-  <>
-    <div className="overlay" onClick={() => setShowPopup(false)} />
-    <div className="popup-container">
-      <h3>Not enough resources for this improvement!</h3>
-      <button onClick={() => setShowPopup(false)}>Close</button>
-    </div>
-  </>
-)}
+      {showPopup && (
+        <>
+          <div className="overlay" onClick={() => setShowPopup(false)} />
+          <div className="popup-container">
+            <h3>{popupMessage}</h3>
+            <button onClick={() => setShowPopup(false)}>Close</button>
+          </div>
+        </>
+      )}
 
       {selectedTile !== null && tiles[selectedTile] === null ? (
         <AddImprovementDialog
@@ -182,6 +206,7 @@ const Map = ({ gridSize, resources, setResources }: MapProps) => {
             level={improvementLevels[selectedTile] || 1}
             resources={resources}
             onUpgrade={handleUpgradeImprovement}
+            onRemove={handleRemoveImprovement}
             onClose={handleCloseDialog}
           />
         )
