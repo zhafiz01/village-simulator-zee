@@ -7,14 +7,24 @@ import "./App.sass"
 import borderImage from "./assets/UpperLeft.png"
 import background from './assets/Background.png'
 
-const App = () => {
-  const [resources, setResources] = useState<Resources>({
-    lumber: 5,
+const initialResources: Resources = {
+  lumber: 5,
     grain: 5,
     water: 5,
     sheep: 1,
     people: 0,
+}
+
+const App = () => {
+  const [resources, setResources] = useState<Resources>({
+    ...initialResources
   })
+  const [placedImprovements, setPlacedImprovements] = useState<{ position: number; type: string}[]>([])
+
+  const resetGame = () => {
+    setResources({ ...initialResources })
+    setPlacedImprovements([])
+  }
 
   const improvementTypes: Improvement[] = [
     {
@@ -109,9 +119,15 @@ const App = () => {
         Click on an improvement to see if you have enough resources to upgrade it.<br />
         Try to fill up the map without running out of resources!
       </p>
-      <div className="game-container"><ResourcesView resources={resources} />
-      <Map gridSize={5} resources={resources} setResources={setResources} />
-    </div>
+      <ResourcesView resources={resources} />
+      <button onClick={resetGame} className="reset-button">Reset Game</button>
+      <Map 
+        gridSize={5} 
+        resources={resources} 
+        setResources={setResources} 
+        placedImprovements={placedImprovements}
+        setPlacedImprovements={setPlacedImprovements}
+        />
     <div className="border-image">
       <img src={borderImage} alt="Border" />
     </div>
