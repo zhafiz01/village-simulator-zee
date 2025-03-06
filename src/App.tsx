@@ -4,6 +4,8 @@ import ResourcesView from "./components/ResourceView"
 import { Improvement } from '../models/Improvement'
 import { Resources } from '../models/Resources'
 import "./App.sass"
+import borderImage from "./assets/UpperLeft.png"
+import background from './assets/Background.png'
 
 const App = () => {
   const [resources, setResources] = useState<Resources>({
@@ -107,9 +109,14 @@ const App = () => {
         Click on an improvement to see if you have enough resources to upgrade it.<br />
         Try to fill up the map without running out of resources!
       </p>
-      <ResourcesView resources={resources} />
+      <div className="game-container"><ResourcesView resources={resources} />
       <Map gridSize={5} resources={resources} setResources={setResources} />
     </div>
+    <div className="border-image">
+      <img src={borderImage} alt="Border" />
+    </div>
+    <div className="app" style={{ background: `url(${background})` }}></div>
+    </div>   
   )
 }
 
