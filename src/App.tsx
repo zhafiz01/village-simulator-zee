@@ -3,7 +3,8 @@ import Map from "./components/Map"
 import ResourcesView from "./components/ResourceView"
 import { Resources } from '../models/Resources'
 import "./App.sass"
-import borderImage from "./assets/UpperLeft.png"
+import borderImage from "./assets/UpperLeft.png" 
+import border2 from "./assets/UpperRight.png"
 import background from './assets/Background.png'
 
 const initialResources: Resources = {
@@ -35,9 +36,10 @@ const App = () => {
     <div>
       <h1 className="header">Village Simulator</h1>
       <p className="intro">
-        Click on a tile to add an improvement. Each improvement costs and adds resources.<br />
-        Click an improvement to upgrade, downgrade, or remove it.<br />
-        Fill up the map without running out of resources!
+      🌿 Click on a tile to add an improvement to your village.<br />
+      🌿 Keep track of how many resources each improvement costs and adds.<br />
+      🌿 Click on an improvement to upgrade, downgrade, or remove it.<br />
+      🌿 Try to fill up the map without running out of resources!
       </p>
       
       <div className="resources-container">
@@ -55,6 +57,9 @@ const App = () => {
       />
       <div className="border-image">
         <img src={borderImage} alt="Border" />
+      </div>
+      <div className="border2">
+      <img src={border2} alt="BorderRight" />
       </div>
       <div className="app" style={{ background: `url(${background})` }}></div>
     </div>
