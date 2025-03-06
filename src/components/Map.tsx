@@ -39,6 +39,14 @@ const upgradeCosts: Record<string, (level: number) => Partial<MapProps["resource
   Pasture: (level) => ({ sheep: level * 3, grain: level * 5 }),
 }
 
+const downgradeReturn: Record<string, (level: number) => Partial<MapProps["resources"]>> = {
+  House: (level) => ({ lumber: level * 20 }),
+  Field: (level) => ({ grain: level * 16, water: level * 10 }),
+  "Lumber Mill": (level) => ({ people: level * 4 }),
+  Well: (level) => ({ water: level * 20 }),
+  Pasture: (level) => ({ sheep: level * 6, grain: level * 10 }),
+}
+
 const Map = ({ gridSize, resources, setResources }: MapProps) => {
   const [tiles, setTiles] = useState<(string | null)[]>(Array(gridSize * gridSize).fill(null))
   const [selectedTile, setSelectedTile] = useState<number | null>(null)
@@ -155,6 +163,49 @@ const Map = ({ gridSize, resources, setResources }: MapProps) => {
     setSelectedTile(null)
   }
 
+  const handleDowngradeImprovment = (newLevel: number) => {
+    if (selectedTile === null) return
+    const currentImprovement = tiles[selectedTile]
+    if (!currentImprovement) return
+
+    const costReturn = downgradeReturn[currentImprovement as keyof typeof downgradeReturn](newLevel)
+    
+
+    setResources((prev) => {
+      const updated = { ...prev }
+      Object.entries(costReturn).forEach(([key, value]) => {
+        updated[key as keyof typeof prev] += value!
+      })
+
+      switch (currentImprovement) {
+        case "House":
+          updated.people += 2
+          break
+        case "Field":
+          updated.grain += 5
+          break
+        case "Pasture":
+          updated.sheep += 3
+          break
+        case "Lumber Mill":
+          updated.lumber += 5
+          break
+        case "Well":
+          updated.water += 5
+          break
+      }
+
+      return updated
+    })
+
+    setImprovementLevels((prevLevels) => ({
+      ...prevLevels,
+      [selectedTile]: newLevel,
+    }))
+
+    setSelectedTile(null)
+  }
+
   const handleRemoveImprovement = () => {
     if (selectedTile === null) return
 
@@ -211,6 +262,7 @@ const Map = ({ gridSize, resources, setResources }: MapProps) => {
             level={improvementLevels[selectedTile] || 1}
             resources={resources}
             onUpgrade={handleUpgradeImprovement}
+            onDowngrade={handleDowngradeImprovment}
             onRemove={handleRemoveImprovement}
             onClose={handleCloseDialog}
           />

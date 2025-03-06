@@ -6,6 +6,7 @@ interface EditImprovementDialogProps {
   level: number
   resources: Resources
   onUpgrade: (newLevel: number) => void
+  onDowngrade: (newLevel: number) => void
   onRemove: () => void
   onClose: () => void
 }
@@ -31,6 +32,7 @@ const EditImprovementDialog = ({
   level = 1,
   resources,
   onUpgrade,
+  onDowngrade,
   onRemove,
   onClose,
 }: EditImprovementDialogProps) => {
@@ -73,6 +75,10 @@ const EditImprovementDialog = ({
 
         <button onClick={() => onUpgrade(newLevel + 1)} disabled={!canUpgrade}>
           Upgrade to Level {newLevel + 1}
+        </button>
+
+        <button onClick={() => onDowngrade(newLevel - 1)}>
+          Downgrade
         </button>
 
         <button onClick={onRemove}>Remove Improvement</button>
