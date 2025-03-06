@@ -5,14 +5,24 @@ import { Improvement } from '../models/Improvement'
 import { Resources } from '../models/Resources'
 import "./App.sass"
 
-const App = () => {
-  const [resources, setResources] = useState<Resources>({
-    lumber: 5,
+const initialResources: Resources = {
+  lumber: 5,
     grain: 5,
     water: 5,
     sheep: 1,
     people: 0,
+}
+
+const App = () => {
+  const [resources, setResources] = useState<Resources>({
+    ...initialResources
   })
+  const [placedImprovements, setPlacedImprovements] = useState<Improvement[]>([])
+
+  const resetGame = () => {
+    setResources({ ...initialResources })
+    setPlacedImprovements([])
+  }
 
   const improvementTypes: Improvement[] = [
     {
@@ -108,7 +118,14 @@ const App = () => {
         Try to fill up the map without running out of resources!
       </p>
       <ResourcesView resources={resources} />
-      <Map gridSize={5} resources={resources} setResources={setResources} />
+      <button onClick={resetGame} className="reset-button">Reset Game</button>
+      <Map 
+        gridSize={5} 
+        resources={resources} 
+        setResources={setResources} 
+        placedImprovements={placedImprovements}
+        setPlacedImprovements={setPlacedImprovements}
+        />
     </div>
   )
 }

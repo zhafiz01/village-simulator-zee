@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Tile from "./Tile"
 import AddImprovementDialog from "./AddImprovementDialog"
 import EditImprovementDialog from "./EditImprovementDialog"
@@ -45,6 +45,8 @@ const Map = ({ gridSize, resources, setResources }: MapProps) => {
   const [improvementLevels, setImprovementLevels] = useState<Record<number, number>>({})
   const [showPopup, setShowPopup] = useState(false)
   const [popupMessage, setPopupMessage] = useState('')
+
+  
 
   const handleTileClick = (index: number) => {
     setSelectedTile(index)
@@ -152,6 +154,8 @@ const Map = ({ gridSize, resources, setResources }: MapProps) => {
     setSelectedTile(null);
   };
 
+
+  
   return (
     <div className="map">
       {tiles.map((improvement, index) => (
